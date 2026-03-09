@@ -1,0 +1,85 @@
+symbols:
+  z:
+    meaning: height above sea surface
+    unit: m
+    code: z
+  P:
+    meaning: atmospheric pressure
+    unit: hPa
+    code: p_hpa
+  T:
+    meaning: absolute temperature
+    unit: K
+    code: t_k, tz
+  e:
+    meaning: water vapor partial pressure
+    unit: hPa
+    code: e_hpa, ez
+  N:
+    meaning: refractivity
+    unit: N-unit
+    code: refractivity_n
+  M:
+    meaning: modified refractivity
+    unit: M-unit
+    code: modified_refractivity_m
+  u_star:
+    meaning: friction velocity
+    unit: m s^-1
+    code: state.u_star
+  t_star:
+    meaning: temperature scale
+    unit: K
+    code: state.t_star
+  q_star:
+    meaning: humidity scale
+    unit: kg kg^-1
+    code: state.q_star
+  L:
+    meaning: Monin-Obukhov length
+    unit: m
+    code: state.L
+  z0m:
+    meaning: momentum roughness length
+    unit: m
+    code: state.z0m
+  z0h:
+    meaning: thermal roughness length
+    unit: m
+    code: state.z0h
+  z0q:
+    meaning: moisture roughness length
+    unit: m
+    code: state.z0q
+constants:
+  kappa: 0.4
+  g: 9.81
+  charnock_alpha: 0.011
+  nu_air: 1.5e-5
+  beta_visc: 0.11
+formula_map:
+  - name: refractivity
+    equation: N = 77.6 P/T + 3.73e5 e/T^2
+    code: refractivity_n
+  - name: modified_refractivity
+    equation: M = N + 0.157 z
+    code: modified_refractivity_m
+  - name: velocity_profile
+    equation: U(z)=u*/k[ln(z/z0m)-psi_m(z/L)+psi_m(z0m/L)]
+    code: solve_state (den_m)
+  - name: temperature_profile
+    equation: theta(z)-theta_s=t*/k[ln(z/z0h)-psi_h(z/L)+psi_h(z0h/L)]
+    code: solve_state/profile
+  - name: humidity_profile
+    equation: q(z)-q_s=q*/k[ln(z/z0q)-psi_h(z/L)+psi_h(z0q/L)]
+    code: solve_state/profile
+  - name: roughness
+    equation: z0m=alpha*u*^2/g + beta*nu/u*
+    code: _roughness_lengths
+  - name: duct_height
+    equation: dM/dz=0 with local minimum condition
+    code: duct_height
+assumptions:
+  - Uses Businger-Dyer stability functions for psi_m and psi_h.
+  - Uses Charnock+viscous roughness, representative of BYC-family implementations.
+  - Pressure is treated as vertically constant in 0-50 m layer for M(z) estimation.
